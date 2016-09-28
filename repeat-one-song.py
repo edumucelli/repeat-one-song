@@ -2,7 +2,7 @@
 #
 # Author: Eduardo Mucelli Rezende Oliveira
 # E-mail: edumucelli@gmail.com or eduardom@dcc.ufmg.br
-# Version: 0.4 for Rhythmbox 3.0.1 or later
+# Version: 0.3 for Rhythmbox 2.99 to 3.0.0
 #
 # This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 from gi.repository import Gio, GObject, GLib, Peas
 from gi.repository import RB
 import os.path, gettext
+import rb
 
 
 class RepeatOneSong (GObject.Object, Peas.Activatable):
@@ -42,7 +43,7 @@ class RepeatOneSong (GObject.Object, Peas.Activatable):
 #        else:
 #            ret, shuffle, repeat_all = player.get_playback_state()
 #            player.set_playback_state(shuffle, self.repeat_all)
-    
+
     # Looks like there is a bug on gstreamer player and a seg fault
     # happens as soon as the 'eos' callback is called.
     # https://bugs.launchpad.net/ubuntu/+source/rhythmbox/+bug/1239218
@@ -56,7 +57,7 @@ class RepeatOneSong (GObject.Object, Peas.Activatable):
         # https://developer.gnome.org/rhythmbox/unstable/RBPlayer.html#RBPlayer-eos
         if self.repeat:
             self.one_song_state = self.one_song_state_eos
-    
+
     # This is a hacky old method to 'repeat' the current song as soon as it
     # reaches the last second. Will be the used until the bug mentioned on the
     # comments above gets fixed.
@@ -64,7 +65,7 @@ class RepeatOneSong (GObject.Object, Peas.Activatable):
         if self.one_song_state == self.one_song_state_eos:
             self.one_song_state = self.one_song_state_normal
             player.do_previous()
-    
+
     # This is a hacky old method to 'repeat' the current song as soon as it
     # reaches the last second. Will be the used until the bug mentioned on the
     # comments above gets fixed.

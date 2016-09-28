@@ -1,5 +1,5 @@
 [Plugin]
-Loader=python3
+Loader=python
 Module=repeat-one-song
 IAge=1
 Name=Repeat One Song
