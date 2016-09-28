@@ -1,6 +1,3 @@
-0.4 (September/27/2016): Updates to 3.3 and later.
-0.3 (November/4/2013): Updates to Rhythmbox 2.99.1, e.g., the one that ships with Ubuntu Sauce Salamander. Thanks to fossfreedom for reporting the bug.
-0.2 (May/2/2012): Updates to Rhythmbox 2.96, e.g., the one that ships with Ubuntu Precise Pangolin. Thanks to André-Nam Berger.
 0.1 (November/6/2010): The first stable version with only the basic function.
 0.0.6.1 (November/6/2010): Fixing the problem that last song in the queue was not being repeated. Thanks to B Clausius.
 0.0.6 (October/28/2010): No more watching the play time in order to repeat the song. It also fixes the Crossfader problem. Thanks to B Clausius.

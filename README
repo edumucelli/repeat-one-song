@@ -4,11 +4,11 @@ I left Songbird and begin using Rhythmbox but the repeat one song feature was no
 
 # Installation
 
-Copy the "repeat-one-song" folder and paste it in ~/.local/share/rhythmbox/plugins/
+Copy the "repeat-one-song" folder and paste it in ~/.gnome2/rhythmbox/plugins/ -- If "plugins" directory does not exist, just create it. If the "rhythmbox" directory does not exist, paste the "repeat-one-song" folder in /usr/lib/rhythmbox/plugins directory.
 
 # Usage
 
-Open Rhythmbox and load the plugin by "Rhythmbox (menu) -> Plugins", select the "Repeat One Song" in the list. Activate the plugin by going on Rhythmbox -> Plugins -> Repeat One Song. To repeat the current song go to Edit (menu) -> Repeat current song, or use Ctrl + E shortcut.
+Open Rhythmbox and load the plugin by "Edit (menu) -> Plug-ins", select the "Repeat One Song" in the list. Activate the plugin by "Control (menu) -> Repeat one", or click in the Toolbar button that shows the Repeat one icon, or you can use the marvelous shortcut Ctrl+E. In version 0.0.5 you can define the number of repetitions for the current song in the Preferences dialog: "Edit (menu) -> Plug-ins", select "Repeat One Song" and "Configure" button will be available in the right panel.
 
 # Contact me
 
@@ -19,7 +19,5 @@ E-mail: edumucelli@gmail.com or eduardom@dcc.ufmg.br
 
 # Thanks to
 
-* Emanuel Vianna: tested several versions of this plugin on his cutting edge distributions.
-* B Clausius: changed the repetition system to rely on the end of stream instead of play time watching.
-* André-Nam Berger: updated for the Rhythmbox 2.96 API
-* fossfreedom: helped pointing out the paths to the 2.99 API
+* Emanuel Vianna: for having tested several versions of this plugin on his cutting edge distributions.
+* B Clausius: for changing using the end of stream instead of play time watching.
