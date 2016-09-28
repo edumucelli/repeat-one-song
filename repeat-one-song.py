@@ -2,7 +2,7 @@
 #
 # Author: Eduardo Mucelli Rezende Oliveira
 # E-mail: edumucelli@gmail.com or eduardom@dcc.ufmg.br
-# Version: 0.4 for Rhythmbox 2.99.1 or later
+# Version: 0.4 for Rhythmbox 3.0.1 or later
 #
 # This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
