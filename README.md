@@ -18,4 +18,4 @@ To repeat the current song you: Edit (menu) -> Repeat current song, or using Ctr
 
 For Rhythmbox 2.98 or inferior:
 
-Open Rhythmbox and load the plugin by "Edit (menu) -> Plug-ins", select the "Repeat One Song" in the list. Activate the plugin by "Control (menu) -> Repeat one", or click in the Toolbar button that shows the Repeat one icon, or you can use the marvelous shortcut Ctrl+E. In later versions to 0.0.5 (unstable) you can define the number of repetitions for the current song in the Preferences dialog: "Edit (menu) -> Plug-ins", select "Repeat One Song" and "Configure" button will be available in the right panel.
+Open Rhythmbox and load the plugin by "Edit (menu) -> Plug-ins", select the "Repeat One Song" in the list. Activate the plugin by "Control (menu) -> Repeat one", or click in the Toolbar button that shows the Repeat one icon, or you can use the marvelous shortcut Ctrl+E.
