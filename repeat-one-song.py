@@ -19,8 +19,8 @@
 # Repeat the current song: menu Edit -> Repeat current song, or using Ctrl + E shortcut
 
 from gi.repository import Gio, GObject, GLib, Peas
-from gi.repository import RB
-import os.path, gettext
+# from gi.repository import RB
+# import os.path, gettext
 
 
 class RepeatOneSong (GObject.Object, Peas.Activatable):
@@ -35,51 +35,45 @@ class RepeatOneSong (GObject.Object, Peas.Activatable):
     def switch_repeat_status(self, action, parameter):
         action.set_state(GLib.Variant.new_boolean(not action.get_state()))
         self.repeat = action.get_state().get_boolean()
-#        player = self.shell.props.shell_player
-#        if self.repeat:
-#            ret, shuffle, self.repeat_all = player.get_playback_state()
-#            player.set_playback_state(shuffle, 1)
-#        else:
-#            ret, shuffle, repeat_all = player.get_playback_state()
-#            player.set_playback_state(shuffle, self.repeat_all)
-    
+        # player = self.shell.props.shell_player
+        # if self.repeat:
+        #    ret, shuffle, self.repeat_all = player.get_playback_state()
+        #    player.set_playback_state(shuffle, 1)
+        # else:
+        #    ret, shuffle, repeat_all = player.get_playback_state()
+        #    player.set_playback_state(shuffle, self.repeat_all)
+
     # Looks like there is a bug on gstreamer player and a seg fault
     # happens as soon as the 'eos' callback is called.
     # https://bugs.launchpad.net/ubuntu/+source/rhythmbox/+bug/1239218
-    # As soon it gets fixed or a code-based workaround gets available,
-    # this method in conjunction with on_song_change will be used as
-    # the way to control the song repetition. Meanwhile, on_elapsed_change
-    # will be the hacky solution
+    # However, newer Rhythmbox versions do not suffer from it anymore
     def on_gst_player_eos(self, gst_player, stream_data, early=0):
         # EOS signal means that the song changed because the song is over.
         # ie. the user did not explicitly change the song.
         # https://developer.gnome.org/rhythmbox/unstable/RBPlayer.html#RBPlayer-eos
         if self.repeat:
             self.one_song_state = self.one_song_state_eos
-    
-    # This is a hacky old method to 'repeat' the current song as soon as it
-    # reaches the last second. Will be the used until the bug mentioned on the
-    # comments above gets fixed.
+
     def on_song_change(self, player, time):
         if self.one_song_state == self.one_song_state_eos:
             self.one_song_state = self.one_song_state_normal
             player.do_previous()
-    
+
     # This is a hacky old method to 'repeat' the current song as soon as it
     # reaches the last second. Will be the used until the bug mentioned on the
     # comments above gets fixed.
     # This might be improved keeping a instance variable with the duration and
     # updating it on_song_change. Therefore, it would not be
     # necessary to query the duration every time
-    def on_elapsed_change(self, player, time):
-        if self.repeat:
-            duration = player.get_playing_song_duration()
-            if duration > 0:
-                # Repeat on the last two seconds of the song. Previously the 
-                # last second was used but RB now seems to use the last second 
-                # to prepare things for the next song of the list
-                if time >= duration - 2:
-                    player.set_playing_time(0)
+    # def on_elapsed_change(self, player, time):
+    #     if self.repeat:
+    #         duration = player.get_playing_song_duration()
+    #         if duration > 0:
+    #             # Repeat on the last two seconds of the song. Previously the
+    #             # last second was used but RB now seems to use the last second
+    #             # to prepare things for the next song of the list
+    #             if time >= duration - 2:
+    #                 player.set_playing_time(0)
 
     def do_activate(self):
         self.__action = Gio.SimpleAction.new_stateful('repeatone', None, GLib.Variant('b', False))
@@ -90,7 +84,8 @@ class RepeatOneSong (GObject.Object, Peas.Activatable):
 
         item = Gio.MenuItem()
         item.set_label(_("Repeat current song"))
-        item.set_attribute_value('accel', GLib.Variant("s", "<Ctrl>E"))     # Keyboard shortcut
+        # Keyboard shortcut
+        item.set_attribute_value('accel', GLib.Variant("s", "<Ctrl>E"))
         item.set_detailed_action('app.repeatone')
         app.add_plugin_menu_item('edit', 'repeatone', item)
 
@@ -98,15 +93,14 @@ class RepeatOneSong (GObject.Object, Peas.Activatable):
 
         self.shell = self.object
 
-        # self.one_song_state_normal, self.one_song_state_eos = range(2)
-        # self.one_song_state = self.one_song_state_normal
+        self.one_song_state_normal, self.one_song_state_eos = range(2)
+        self.one_song_state = self.one_song_state_normal
 
         player = self.shell.props.shell_player
-        # Please refer to the comments above to understand why those
-        # two callbacks are not being used currently, Rhytmbox 2.99.1
-        # player.connect('playing-song-changed', self.on_song_change)
-        # player.props.player.connect('eos', self.on_gst_player_eos)
-        player.connect('elapsed-changed', self.on_elapsed_change)
+
+        player.connect('playing-song-changed', self.on_song_change)
+        player.props.player.connect('eos', self.on_gst_player_eos)
+        # player.connect('elapsed-changed', self.on_elapsed_change)
 
     def do_deactivate(self):
         app = Gio.Application.get_default()
