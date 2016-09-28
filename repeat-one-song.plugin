@@ -1,9 +1,9 @@
 [Plugin]
-Loader=python3
+Loader=python
 Module=repeat-one-song
 IAge=1
 Name=Repeat One Song
 Description="Repeat One Song" will repeat the song that is being currently played
 Authors=Eduardo Mucelli Rezende Oliveira <edumucelli@gmail.com>
-Copyright=Copyright © 2010 - 2016 Eduardo Mucelli Rezende Oliveira
+Copyright=Copyright © 2010 Eduardo Mucelli Rezende Oliveira
 Website=https://launchpad.net/repeat-one-song

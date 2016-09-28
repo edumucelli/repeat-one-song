@@ -2,7 +2,7 @@
 #
 # Author: Eduardo Mucelli Rezende Oliveira
 # E-mail: edumucelli@gmail.com or eduardom@dcc.ufmg.br
-# Version: 0.4 for Rhythmbox 3.0.1 or later
+# Version: 0.2 for Rhythmbox 2.96 to 2.98
 #
 # This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -14,13 +14,30 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 
-# This plugin provides the "repeat one song" feature for Rhythmbox
-# Activate the plugin by going on Rhythmbox -> Plugins -> Repeat One Song
-# Repeat the current song: menu Edit -> Repeat current song, or using Ctrl + E shortcut
+# This plugin provides the "repeat one song" feature to Rhythmbox
+# Active it by clicking on the Repeat one button in the Toolbar,
+# by menu Control -> Repeat one, or using Ctrl + E shortcut
 
-from gi.repository import Gio, GObject, GLib, Peas
-from gi.repository import RB
+from gi.repository import GObject, RB, Peas, Gtk
 import os.path, gettext
+import rb
+
+# The XML which defines the buttons within the menu bar, toolbar and their respective actions 
+ui_str = \
+        """
+        <ui>
+            <menubar name="MenuBar">
+                <menu name="ControlMenu" action="Control">
+                  <menuitem name="control_menu_repeat_one" action="RepeatOne"/>
+                </menu>
+            </menubar>
+            <toolbar name="ToolBar">
+                <placeholder name="ToolBarPluginPlaceholder">
+                    <toolitem name="repeat_one" action="RepeatOne"/>
+                </placeholder>
+            </toolbar>
+        </ui>
+        """
 
 
 class RepeatOneSong (GObject.Object, Peas.Activatable):
@@ -28,88 +45,94 @@ class RepeatOneSong (GObject.Object, Peas.Activatable):
     object = GObject.property(type=GObject.Object)
 
     def __init__(self):
-        GObject.Object.__init__(self)
+        super(RepeatOneSong, self).__init__()
 
-    # Controls the flag that indicates whether the toggle 'repeat'
-    # is active or not.
-    def switch_repeat_status(self, action, parameter):
-        action.set_state(GLib.Variant.new_boolean(not action.get_state()))
-        self.repeat = action.get_state().get_boolean()
-#        player = self.shell.props.shell_player
-#        if self.repeat:
-#            ret, shuffle, self.repeat_all = player.get_playback_state()
-#            player.set_playback_state(shuffle, 1)
-#        else:
-#            ret, shuffle, repeat_all = player.get_playback_state()
-#            player.set_playback_state(shuffle, self.repeat_all)
-    
-    # Looks like there is a bug on gstreamer player and a seg fault
-    # happens as soon as the 'eos' callback is called.
-    # https://bugs.launchpad.net/ubuntu/+source/rhythmbox/+bug/1239218
-    # As soon it gets fixed or a code-based workaround gets available,
-    # this method in conjunction with on_song_change will be used as
-    # the way to control the song repetition. Meanwhile, on_elapsed_change
-    # will be the hacky solution
+    def switch_repeat_status(self, control):
+        # Although there is only one action, it could be used throughout all the code as 'self.action'
+        # However, the proper way to proceed it to put the actions within a group then retrieve them with get_action
+        action = self.action_group.get_action('RepeatOne')                  # selects the action to repeat the current song
+        self.repeat = action.get_active()                                   # indicates whether the button is checked or not
+        player = self.shell.props.shell_player
+        if self.repeat:
+            ret, shuffle, self.repeat_all = player.get_playback_state()
+            player.set_playback_state(shuffle, 1)
+        else:
+            ret, shuffle, repeat_all = player.get_playback_state()
+            player.set_playback_state(shuffle, self.repeat_all)
+
+    def switch_repeat_all_status(self, action):
+        if not action.get_active() and self.repeat:
+            self.repeat = False
+            self.repeat_all = 0
+            action_repeat_one = self.action_group.get_action('RepeatOne')
+            action_repeat_one.set_active(False)
+
+    def load_icon(self):
+        """Deals with the addition of the icon into the toolbar. The icon is named as 'repeat-one-song',
+           which will be later on used as the last parameter of the gtk.ToggleAction inside generate_ui"""
+        icon_file_name = rb.find_plugin_file(self, "icon.svg")
+        iconsource = Gtk.IconSource()
+        iconsource.set_filename(icon_file_name)
+        iconset = Gtk.IconSet()
+        iconset.add_source(iconsource)
+        iconfactory = Gtk.IconFactory()
+        iconfactory.add("repeat-one-song", iconset)
+        iconfactory.add_default()
+
+    def generate_ui(self):
+        """Define the actions attached to the switch_repeat_status method, the translatable labels, and toolbar button icons
+           At the end it is necessary to mixin the XML string to add such features to the RB's UI"""
+        self.action_group = Gtk.ActionGroup('RepeatOneActionGroup')         
+
+        # Creates the action toggle
+        # RepeatOne (the named action), translatable string of Control menu), translatable string of Toolbar, icon defined above (see load_icon())
+        action = Gtk.ToggleAction("RepeatOne", _("Repeat one"), _("Repeat the current song when it's finished"), "repeat-one-song")
+        self.action_group.add_action_with_accel(action, "<Control>E")       # add shortcut
+        action.connect("activate", self.switch_repeat_status)               # when the button gets triggered
+
+        manager = self.shell.props.ui_manager
+        manager.insert_action_group(self.action_group, 0)
+        self.uid = manager.add_ui_from_string(ui_str)                       # mixes in defined XML with RB
+        manager.ensure_update()
+
+        action = manager.get_action('/ToolBar/Repeat')
+        action.connect("activate", self.switch_repeat_all_status)
+
+    def do_activate(self):                                                  # when loading the applet
+        self.shell = self.object
+        self.db = self.shell.props.db
+        self.repeat = False
+
+        self.one_song_state_normal, self.one_song_state_eos = range(2)
+        self.one_song_state = self.one_song_state_normal
+
+        self.load_icon()                                                    # necessary load icon first ...
+        self.generate_ui()                                                  # ... because it is used here 
+
+        player = self.shell.props.shell_player
+        player.connect('playing-song-changed', self.on_song_change)         # changed song, player.do_next() calls on_elapsed_changed
+        player.props.player.connect('eos', self.on_gst_player_eos)          # eos -> on_song_change
+
+    def do_deactivate(self):                                                # when unloading applet
+        if self.repeat:
+            player = self.shell.props.shell_player
+            ret, shuffle, repeat_all = player.get_playback_state()
+            player.set_playback_state(shuffle, self.repeat_all)
+
+        for attr in (self.db, self.shell, self.repeat,                      # delete global attributes if possible
+                     self.one_song_state_normal, self.one_song_state_eos):
+            if attr:
+                del attr
+        manager = self.shell.props.ui_manager
+        manager.remove_ui(self.uid)
+        manager.remove_action_group(self.action_group)
+        manager.ensure_update()
+
     def on_gst_player_eos(self, gst_player, stream_data, early=0):
-        # EOS signal means that the song changed because the song is over.
-        # ie. the user did not explicitly change the song.
-        # https://developer.gnome.org/rhythmbox/unstable/RBPlayer.html#RBPlayer-eos
         if self.repeat:
             self.one_song_state = self.one_song_state_eos
-    
-    # This is a hacky old method to 'repeat' the current song as soon as it
-    # reaches the last second. Will be the used until the bug mentioned on the
-    # comments above gets fixed.
-    def on_song_change(self, player, time):
+
+    def on_song_change(self, player, time):                              # when song has changed ...
         if self.one_song_state == self.one_song_state_eos:
             self.one_song_state = self.one_song_state_normal
             player.do_previous()
-    
-    # This is a hacky old method to 'repeat' the current song as soon as it
-    # reaches the last second. Will be the used until the bug mentioned on the
-    # comments above gets fixed.
-    # This might be improved keeping a instance variable with the duration and
-    # updating it on_song_change. Therefore, it would not be
-    # necessary to query the duration every time
-    def on_elapsed_change(self, player, time):
-        if self.repeat:
-            duration = player.get_playing_song_duration()
-            if duration > 0:
-                # Repeat on the last two seconds of the song. Previously the 
-                # last second was used but RB now seems to use the last second 
-                # to prepare things for the next song of the list
-                if time >= duration - 2:
-                    player.set_playing_time(0)
-
-    def do_activate(self):
-        self.__action = Gio.SimpleAction.new_stateful('repeatone', None, GLib.Variant('b', False))
-        self.__action.connect('activate', self.switch_repeat_status)
-
-        app = Gio.Application.get_default()
-        app.add_action(self.__action)
-
-        item = Gio.MenuItem()
-        item.set_label(_("Repeat current song"))
-        item.set_attribute_value('accel', GLib.Variant("s", "<Ctrl>E"))     # Keyboard shortcut
-        item.set_detailed_action('app.repeatone')
-        app.add_plugin_menu_item('edit', 'repeatone', item)
-
-        self.repeat = False
-
-        self.shell = self.object
-
-        # self.one_song_state_normal, self.one_song_state_eos = range(2)
-        # self.one_song_state = self.one_song_state_normal
-
-        player = self.shell.props.shell_player
-        # Please refer to the comments above to understand why those
-        # two callbacks are not being used currently, Rhytmbox 2.99.1
-        # player.connect('playing-song-changed', self.on_song_change)
-        # player.props.player.connect('eos', self.on_gst_player_eos)
-        player.connect('elapsed-changed', self.on_elapsed_change)
-
-    def do_deactivate(self):
-        app = Gio.Application.get_default()
-        app.remove_action('repeatone')
-        app.remove_plugin_menu_item('edit', 'repeatone')
-        del self.__action
