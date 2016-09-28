@@ -1,0 +1,25 @@
+# The history
+
+I left Songbird and begin using Rhythmbox but the repeat one song feature was not present. I cried ... a lot, but from scratch I did learn some Python and Rhythmbox plugins idea and poof! the plugin is here.
+
+# Installation
+
+Copy the "repeat-one-song" folder and paste it in ~/.local/share/rhythmbox/plugins/
+
+# Usage
+
+Open Rhythmbox and load the plugin by "Rhythmbox (menu) -> Plugins", select the "Repeat One Song" in the list. Activate the plugin by going on Rhythmbox -> Plugins -> Repeat One Song. To repeat the current song go to Edit (menu) -> Repeat current song, or use Ctrl + E shortcut.
+
+# Contact me
+
+Any doubt, suggestion or anything else, except asking for some money, I would be pleased to received a message from you. :¬)
+
+Author: Eduardo Mucelli Rezende Oliveira
+E-mail: edumucelli@gmail.com or eduardom@dcc.ufmg.br
+
+# Thanks to
+
+* Emanuel Vianna: tested several versions of this plugin on his cutting edge distributions.
+* B Clausius: changed the repetition system to rely on the end of stream instead of play time watching.
+* André-Nam Berger: updated for the Rhythmbox 2.96 API
+* fossfreedom: helped pointing out the paths to the 2.99 API

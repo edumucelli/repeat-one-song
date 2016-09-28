@@ -1,0 +1,13 @@
+0.4 (September/27/2016): Updates to 3.3 and later.
+0.3 (November/4/2013): Updates to Rhythmbox 2.99.1, e.g., the one that ships with Ubuntu Sauce Salamander. Thanks to fossfreedom for reporting the bug.
+0.2 (May/2/2012): Updates to Rhythmbox 2.96, e.g., the one that ships with Ubuntu Precise Pangolin. Thanks to André-Nam Berger.
+0.1 (November/6/2010): The first stable version with only the basic function.
+0.0.6.1 (November/6/2010): Fixing the problem that last song in the queue was not being repeated. Thanks to B Clausius.
+0.0.6 (October/28/2010): No more watching the play time in order to repeat the song. It also fixes the Crossfader problem. Thanks to B Clausius.
+0.0.5.2 (October/27/2010): Fixing the play count. Thanks to B Clausius.
+0.0.5.1 (September/12/2010): Small bug fix, Launchpad bug #636228.
+0.0.5 (August/13/2010): It is possible to define, through Preferences dialog, the current song's number of repetitions, or keep it infitine as usual.
+0.0.4 (June/2/2010): Internationalization support; Brazilian portuguese, Spanish and French languages are supported. Some code refactoring.
+0.0.3 (May/28/2010): New icon based on gnome-media-playlist-repeat.svg
+0.0.2 (May/28/2010): Some small things such code commentary, changing the Website in repeat-one-song.rb-plugin, and some insignificant things I forgot.
+0.0.1 (May/27/2010): The Repeat One Song bornt here, basic usage with Toolbar, and Control menu buttons.
