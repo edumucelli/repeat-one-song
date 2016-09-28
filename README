@@ -12,6 +12,7 @@ For Rhythmbox 2.99 or superior:
 Open Rhythmbox and load the plugin by "Rhythmbox (menu) -> Plugins", select the "Repeat One Song" in the list.
 To repeat the current song you: Edit (menu) -> Repeat current song, or using Ctrl + E shortcut
 
+<img src="https://raw.githubusercontent.com/edumucelli/repeat-one-song/master/activate_1.png" alt="alt text" width="200px">
 ![Plugins](https://raw.githubusercontent.com/edumucelli/repeat-one-song/master/activate_1.png)
 ![Check it](https://raw.githubusercontent.com/edumucelli/repeat-one-song/master/activate_2.png)
 ![Check it](https://raw.githubusercontent.com/edumucelli/repeat-one-song/master/repeat.png)
